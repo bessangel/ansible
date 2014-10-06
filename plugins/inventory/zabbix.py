@@ -64,6 +64,7 @@ class ZabbixInventory(object):
     def read_cli(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('--host')
+        parser.add_argument('--hostid')
         parser.add_argument('--list', action='store_true')
         self.options = parser.parse_args()
 
@@ -73,8 +74,13 @@ class ZabbixInventory(object):
         }
 
     def get_host(self, api, name):
-        data = {}
+        data = api.host.get({'output': 'extend', 'search': {'name':name,'host':name} })
         return data
+
+    def get_by_hostid(self, api, query):
+        data = api.host.get({'output': 'extend', 'filter': {'hostid':query} })
+        return data
+
 
     def get_list(self, api):
         hostsData = api.host.get({'output': 'extend', 'selectGroups': 'extend'})
@@ -116,14 +122,18 @@ class ZabbixInventory(object):
 
             if self.options.host:
                 data = self.get_host(api, self.options.host)
-                print json.dumps(data, indent=2)
+                print json.dumps(data, indent=2, sort_keys=True)
+
+            if self.options.hostid:
+                data = self.get_by_hostid(api, self.options.hostid)
+                print json.dumps(data, indent=2, sort_keys=True)
 
             elif self.options.list:
                 data = self.get_list(api)
-                print json.dumps(data, indent=2)
+                print json.dumps(data, indent=2, sort_keys=True)
 
             else:
-                print >> sys.stderr, "usage: --list  ..OR.. --host <hostname>"
+                print >> sys.stderr, "usage: --list  ..OR.. --host <hostname> ..OR.. --hostid <NUMBER>"
                 sys.exit(1)
 
         else:
