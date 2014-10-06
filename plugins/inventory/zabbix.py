@@ -124,7 +124,7 @@ class ZabbixInventory(object):
                 data = self.get_host(api, self.options.host)
                 print json.dumps(data, indent=2, sort_keys=True)
 
-            if self.options.hostid:
+            elif self.options.hostid:
                 data = self.get_by_hostid(api, self.options.hostid)
                 print json.dumps(data, indent=2, sort_keys=True)
 
